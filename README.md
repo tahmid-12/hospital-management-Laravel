@@ -1,58 +1,108 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hospital Management System API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel 13 backend for a hospital management platform built with PostgreSQL, UUID primary keys, API versioning, and Laravel Sanctum authentication.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Laravel 13
+- PHP 8.3+
+- PostgreSQL 17+
+- Laravel Sanctum
+- UUID-based primary keys
+- Route ? Controller ? Service ? Model architecture
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Project goals
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Manage departments, doctors, patients, appointments, medicines, and rooms
+- Secure the API with Sanctum tokens
+- Keep database naming PostgreSQL-safe for local development
+- Follow lower snake_case and versioned API endpoints under `/api/v1`
 
-## Learning Laravel
+## Local PostgreSQL setup
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+This project uses PostgreSQL-safe identifiers because PostgreSQL can fail when the default schema resolves from a role or database name that contains hyphens. For example, `Hospital-Management` can break the default `$user` search path on local Windows setups.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Use the following local values in the application environment:
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=hospital_management
+DB_USERNAME=hospital_management
+DB_PASSWORD=123456
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Installation
 
-## Contributing
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --force
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Authentication
 
-## Code of Conduct
+Auth endpoints are available under `/api/v1/auth`:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/logout`
+- `GET /api/v1/auth/me`
 
-## Security Vulnerabilities
+The API uses Sanctum token authentication and all resource routes are protected with `auth:sanctum`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Core API modules
 
-## License
+Protected resource endpoints:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- `GET /api/v1/departments`
+- `POST /api/v1/departments`
+- `GET /api/v1/departments/{id}`
+- `PUT /api/v1/departments/{id}`
+- `DELETE /api/v1/departments/{id}`
+- `GET /api/v1/doctors`
+- `POST /api/v1/doctors`
+- `GET /api/v1/doctors/{id}`
+- `PUT /api/v1/doctors/{id}`
+- `DELETE /api/v1/doctors/{id}`
+- `GET /api/v1/patients`
+- `POST /api/v1/patients`
+- `GET /api/v1/patients/{id}`
+- `PUT /api/v1/patients/{id}`
+- `DELETE /api/v1/patients/{id}`
+- `GET /api/v1/appointments`
+- `POST /api/v1/appointments`
+- `GET /api/v1/appointments/{id}`
+- `PUT /api/v1/appointments/{id}`
+- `DELETE /api/v1/appointments/{id}`
+- `GET /api/v1/medicines`
+- `POST /api/v1/medicines`
+- `GET /api/v1/medicines/{id}`
+- `PUT /api/v1/medicines/{id}`
+- `DELETE /api/v1/medicines/{id}`
+- `GET /api/v1/rooms`
+- `POST /api/v1/rooms`
+- `GET /api/v1/rooms/{id}`
+- `PUT /api/v1/rooms/{id}`
+- `DELETE /api/v1/rooms/{id}`
+
+## Architecture
+
+The application follows the required structure:
+
+- Route definition in `routes/api.php`
+- Controller logic in `app/Http/Controllers/Api/V1`
+- Business logic in `app/Services`
+- Persistence and relationships in `app/Models`
+- API JSON shaping in `app/Http/Resources`
+- PostgreSQL schema definitions in `database/migrations`
+
+## Notes
+
+- UUID primary keys are used across all major models.
+- Lower snake_case naming conventions are used for schema fields.
+- Validation is performed in controller methods using Laravel validators.
+- Errors return a consistent JSON payload with `success`, `message`, and optional `errors` keys.
